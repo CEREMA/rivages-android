@@ -47,6 +47,8 @@ import java.util.LinkedList;
 import java.util.Locale;
 import java.util.Queue;
 
+import net.gotev.uploadservice.*;
+
 
 // Christophe MOULIN - Cerema Med / DREC / SVGC - 23 juin 2016
 //
@@ -757,7 +759,21 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
 
             // préparation de l'email
             if (zipIsOk) {
+
+                //
                 Uri path = Uri.fromFile(exportDir);
+                // on upload le fichier
+                try {
+                    String uploadId =
+                            new MultipartUploadRequest(context, "http://omneedia.com:5000/upload")
+                                    // starting from 3.1+, you can also use content:// URI string instead of absolute file
+                                    .addFileToUpload(path.getPath(), "zip")
+                                    .setNotificationConfig(new UploadNotificationConfig())
+                                    .setMaxRetries(2)
+                                    .startUpload();
+                } catch (Exception exc) {
+                    Log.e("AndroidUploadService", exc.getMessage(), exc);
+                }
                 Log.i(TAG, "path:"+exportDir.toString());
                 emailIntent = new Intent(Intent.ACTION_SEND);
                 // type d'Email

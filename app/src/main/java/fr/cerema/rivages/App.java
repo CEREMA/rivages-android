@@ -1,8 +1,6 @@
 package fr.cerema.rivages;
 
 import android.app.Application;
-import android.util.Log;
-
 
 import net.gotev.uploadservice.UploadService;
 import net.gotev.uploadservice.okhttp.OkHttpStack;
