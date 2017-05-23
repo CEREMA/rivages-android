@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array   name="type">
+        <item>Instanteous waterline</item>
+		<item>Vegetation line (dune excluded)</item>
+		<item>Seaward dune vegetation line</item>
+        <item>Strips of pebbles</item>
+        <item>Bottom of beach</item>
+        <item>Dune toe - dune cliff</item>
+        <item>Last high water mark (after storm)</item>
+        <item>Other</item>
+    </string-array>
+	    <string-array   name="numero">
+            <item>3</item>
+			<item>13</item>
+            <item>11</item>
+            <item>19</item>
+            <item>7</item>
+            <item>8</item>
+            <item>5</item>
+            <item>25</item>
+    </string-array>
+</resources>

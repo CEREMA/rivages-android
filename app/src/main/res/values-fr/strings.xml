@@ -1,0 +1,66 @@
+<resources>
+    <string name="app_name">Rivages</string>
+    <string name="title_activity_main">Enregistrement</string>
+    <string name="langage">fr</string>
+
+    <!-- SPLASH -->
+    <string name="text_splash">Devenez un acteur du littoral !</string>
+    <string name="version">Version 1.5</string>
+
+    <!-- Main Activity -->
+    <string name="logo_removed">Le logo a été enlevé</string>
+
+    <!-- GPS Service -->
+    <string name="latitude">Latitude : %.6f</string>
+    <string name="longitude">Longitude : %.6f</string>
+    <string name="accuracy">Précision : %d m</string>
+    <string name="satellites">Nombre de satellites utilisés : %d</string>
+    <string name="sequences">Nombre de séquences enregistrées : %d</string>
+    <string name="nbPoints">Nombre de points enregistrés : %d</string>
+    <string name="change">Choisir</string>
+    <string name="running">en cours…</string>
+    <string name="sort_alert_title">Aller au menu GPS ?</string>
+    <string name="sort_alert_text">Rivages a besoin du GPS, actuellement désactivé. Vous pouvez l\'activer à partir des paramètres de votre appareil.</string>
+    <string name="sort_alert_yes">Aller au menu</string>
+    <string name="sort_alert_no">Revenir</string>
+    <string name="no_points">Vous n\'avez pas enregistré de points !</string>
+    <string name="start">L\'enregistrement commence</string>
+    <string name="pause">Pause</string>
+    <string name="photoAdded">Photo ajoutée</string>
+    <string name="invalidLogo">Mauvais choix pour votre logo ! Il y a eu une erreur.</string>
+
+    <!-- Email -->
+    <string name="mail_text">Bonjour, voici ma contribution au suivi du trait de cote. Cordialement.</string>
+    <string name="mail_subject">Trait de cote</string>
+    <string name="error">Il y a eu un probléme !</string>
+    <string name="no_camera">Pas d\'appareil photo !</string>
+    <string name="envoi_title">Préparation des données</string>
+
+    <!-- Dialogues -->
+    <string name="exit_title">Sortie de l\'application</string>
+    <string name="exit_text">Voulez-vous vraiment quitter l\'application sans envoyer de données ?</string>
+    <string name="exit_yes">Quitter</string>
+    <string name="exit_no">Revenir</string>
+
+    <string name="logo_title">Ajout d\'un logo</string>
+    <string name="logo_text1">Vous avez pris une photo.</string>
+    <string name="logo_text2">Souhaitez-vous incruster un logo dans toutes vos photos à venir ?</string>
+    <string name="logo_yes">Choisir</string>
+    <string name="logo_cancel">Annuler</string>
+    <string name="logo_no">Non</string>
+    <string name="logo_ask">Ne plus me redemander</string>
+
+    <string name="warning_title">Attention !</string>
+    <string name="warning_text">Rivages utilise votre GPS à sa précision maximale. Cela entraîne une consommation de batterie.</string>
+    <string name="warning_yes">OK</string>
+
+    <string name="osm_link">les contributeurs d\'<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a></string>
+
+    <string name="trait_title">Type de trait de côte ?</string>
+    <string name="type_trait_nouveau_segment">Nouveau segment</string>
+    <string name="type_trait_segment_actuel">Continuer</string>
+
+    <string name="thank_text1">L\'envoi va se faire par courriel.</string>
+    <string name="thank_text2">Merci pour votre participation à la connaissance du trait de côte!</string>
+
+</resources>

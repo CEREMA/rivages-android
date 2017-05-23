@@ -1,0 +1,66 @@
+<resources>
+    <string name="app_name">Rivages</string>
+    <string name="title_activity_main">Recording</string>
+    <string name="langage">en</string>
+
+    <!-- SPLASH -->
+    <string name="text_splash">Shore line recording</string>
+    <string name="version">Version 1.5</string>
+
+    <!-- Main Activity -->
+    <string name="logo_removed">Logo removed</string>
+
+    <!-- GPS Service -->
+    <string name="latitude">Latitude : %.6f</string>
+    <string name="longitude">Longitude : %.6f</string>
+    <string name="accuracy">Accuracy : %d m</string>
+    <string name="satellites">Number of satellites used : %d</string>
+    <string name="sequences">Number of sequences : %d</string>
+    <string name="nbPoints">Number of points recorded : %d</string>
+    <string name="change">Select</string>
+    <string name="running">running…</string>
+    <string name="sort_alert_title">Open GPS settings ?</string>
+    <string name="sort_alert_text">Rivages needs GPS, which is currently off. You can switch it on from device settings</string>
+    <string name="sort_alert_yes">Go to settings</string>
+    <string name="sort_alert_no">Back</string>
+    <string name="no_points">No points to send !</string>
+    <string name="start">Start recording</string>
+    <string name="pause">Pause</string>
+    <string name="photoAdded">The photo will be attached</string>
+    <string name="invalidLogo">Error. Invalid choice for your logo !</string>
+
+    <!-- Email -->
+    <string name="mail_text">Bonjour, voici ma contribution au suivi du trait de cote. Cordialement.</string>
+    <string name="mail_subject">Trait de cote</string>
+    <string name="error">Error !</string>
+    <string name="no_camera">No camera !</string>
+    <string name="envoi_title">Data preparation</string>
+
+    <!-- Dialogues -->
+    <string name="exit_title">Exit</string>
+    <string name="exit_text">Do you really want to quit without saving your data ?</string>
+    <string name="exit_yes">Quit</string>
+    <string name="exit_no">Back</string>
+
+    <string name="logo_title">Adding a logo</string>
+    <string name="logo_text1">You have taken a photo.</string>
+    <string name="logo_text2">Do you want to join a logo here and in all the future photos ?</string>
+    <string name="logo_yes">Choose</string>
+    <string name="logo_cancel">Cancel</string>
+    <string name="logo_no">No</string>
+    <string name="logo_ask">Don\'t ask me again</string>
+
+    <string name="warning_title">Warning !</string>
+    <string name="warning_text">Rivages uses your GPS phone with maximal accuracy. It causes drain battery.</string>
+    <string name="warning_yes">OK</string>
+
+    <string name="thank_text1">Sending by E-Mail.</string>
+    <string name="thank_text2">Thanks for your contribution to the shoreline knowledge!</string>
+
+    <string name="osm_link"><a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors</string>
+
+    <string name="trait_title">Shoreline type ?</string>
+    <string name="type_trait_nouveau_segment">New segment</string>
+    <string name="type_trait_segment_actuel">Continue</string>
+
+</resources>
