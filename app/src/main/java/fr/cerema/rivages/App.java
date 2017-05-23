@@ -12,10 +12,13 @@ import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import com.androidnetworking.*;
+import com.jacksonandroidnetworking.*;
 
 /**
  * Created by zucatti on 22/05/2017.
  */
+
 
 public class App extends Application {
     @Override
@@ -28,6 +31,8 @@ public class App extends Application {
         // Or, you can define it manually.
         UploadService.NAMESPACE = "fr.cerema.rivages";
         UploadService.HTTP_STACK = new OkHttpStack(getOkHttpClient());
+        AndroidNetworking.initialize(getApplicationContext());
+        AndroidNetworking.setParserFactory(new JacksonParserFactory());
     }
     private OkHttpClient getOkHttpClient() {
         return new OkHttpClient.Builder()

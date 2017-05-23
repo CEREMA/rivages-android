@@ -1,9 +1,25 @@
 apply plugin: 'com.android.application'
 
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'org.osmdroid:osmdroid-android:5.2@aar'
+    compile 'net.gotev:uploadservice:3.2.3'
+    compile 'net.gotev:uploadservice-okhttp:3.2.3'
+    compile 'com.amitshekhar.android:android-networking:1.0.0'
+    compile 'com.amitshekhar.android:jackson-android-networking:1.0.0'
+}
+
 android {
     compileSdkVersion 23
     buildToolsVersion '25.0.0'
-
+    packagingOptions {
+        exclude 'META-INF/DEPENDENCIES'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/LICENSE.txt'
+    }
     defaultConfig {
         applicationId "fr.cerema.rivages"
         minSdkVersion 10
@@ -24,6 +40,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
 }
 
 repositories {
@@ -35,10 +52,4 @@ repositories {
 
 }
 
-dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:23.4.0'
-    compile 'org.osmdroid:osmdroid-android:5.2@aar'
-    compile 'net.gotev:uploadservice:3.2.3'
-    compile 'net.gotev:uploadservice-okhttp:3.2.3'
-}
+

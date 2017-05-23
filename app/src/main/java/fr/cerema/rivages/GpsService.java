@@ -49,6 +49,17 @@ import java.util.Queue;
 
 import net.gotev.uploadservice.*;
 
+import android.telephony.TelephonyManager;
+
+import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.Priority;
+import com.androidnetworking.common.ConnectionQuality;
+import com.androidnetworking.interfaces.ConnectionQualityChangeListener;
+import com.jacksonandroidnetworking.JacksonParserFactory;
+import com.androidnetworking.interfaces.JSONObjectRequestListener;
+import org.json.JSONObject;
+import com.androidnetworking.error.ANError;
+
 
 // Christophe MOULIN - Cerema Med / DREC / SVGC - 23 juin 2016
 //
@@ -757,16 +768,56 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
             }
 
 
-            // préparation de l'email
+            // préparation de l'upload
             if (zipIsOk) {
 
-                //
-                Uri path = Uri.fromFile(exportDir);
-                // on upload le fichier
+
+                /* SZ: On communique au serveur de téléchargement le MD5 du fichier zip et l'IMEI
+                   du smartphone et on reçoit en réponse une url de téléchargement unique
+                   POST /token
+                   param: md5 = string
+                   param: imei = string
+                   response: JSON
+                   {
+                        url: "https://upload-server.com/upload/unique-id"
+                   }
+                */
+
+                final Uri path = Uri.fromFile(exportDir);
+                String md5 = MD5.calculateMD5(new File(path.getPath()));
+                TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
+                String deviceID = telephonyManager.getDeviceId();
+
+                AndroidNetworking.post("http://omneedia.com:5000/token")
+                .addBodyParameter("md5", md5)
+                .addBodyParameter("did", deviceID)
+                .build()
+                .getAsJSONObject(new JSONObjectRequestListener() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            String uploadId =
+                                    new MultipartUploadRequest(context, response.optString("url"))
+                                            .addFileToUpload(path.getPath(), "zip")
+                                            .setNotificationConfig(new UploadNotificationConfig())
+                                            .setMaxRetries(2)
+                                            .startUpload();
+                        } catch (Exception exc) {
+                            Log.e("AndroidUploadService", exc.getMessage(), exc);
+                        }
+                    }
+                    @Override
+                    public void onError(ANError error) {
+                        // handle error
+                    }
+                });
+
+                // SZ: On upload le fichier
+
+/*
                 try {
                     String uploadId =
                             new MultipartUploadRequest(context, "http://omneedia.com:5000/upload")
-                                    // starting from 3.1+, you can also use content:// URI string instead of absolute file
                                     .addFileToUpload(path.getPath(), "zip")
                                     .setNotificationConfig(new UploadNotificationConfig())
                                     .setMaxRetries(2)
@@ -774,22 +825,9 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
                 } catch (Exception exc) {
                     Log.e("AndroidUploadService", exc.getMessage(), exc);
                 }
+*/
                 Log.i(TAG, "path:"+exportDir.toString());
-                emailIntent = new Intent(Intent.ACTION_SEND);
-                // type d'Email
-                emailIntent.setType("plain/text");
-                // destinataires - ici un seul rivages@cerema.fr
-                emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[] {CEREMA_MAIL});
-                // ajout de la PJ
-                emailIntent.putExtra(Intent.EXTRA_STREAM, path);
-                // texte type défini dans les ressources, auquel on ajoute le nom technique de l'appareil
-                emailIntent.putExtra(Intent.EXTRA_TEXT, getString(R.string.mail_text));
-                // objet du message défini dans les ressources
-                emailIntent.putExtra(Intent.EXTRA_SUBJECT, String.format(Locale.FRANCE, "%1$s %2$s",getString(R.string.mail_subject), dateName));
-                // lancement du courrielleur par défaut
-                //emailIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse("content://path/to/email/attachment"));
-                emailIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivity(emailIntent);
+
             }
             else error=true;
             return null;
