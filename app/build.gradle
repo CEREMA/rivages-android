@@ -25,7 +25,7 @@ android {
         minSdkVersion 10
         targetSdkVersion 22
         versionCode 4
-        versionName "1.5"
+        versionName "1.6"
     }
     configurations.all {
         resolutionStrategy {
