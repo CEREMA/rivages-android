@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array   name="type">
+        <item>Wasserlinie</item>
+		<item>Vegetationslinie (Dünen ausgeschlossen)</item>
+		<item>Dünenvegetationslinie</item>
+        <item>Steinchenlinie</item>
+        <item>Bottom of beach</item>
+        <item>Dünenspitze - Dünenklippe</item>
+        <item>Hochwassermarke (nach Sturm)</item>
+        <item>Andere</item>
+    </string-array>
+	    <string-array   name="numero">
+            <item>3</item>
+			<item>13</item>
+            <item>11</item>
+            <item>19</item>
+            <item>7</item>
+            <item>8</item>
+            <item>5</item>
+            <item>25</item>
+    </string-array>
+</resources>

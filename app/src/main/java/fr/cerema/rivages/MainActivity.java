@@ -587,7 +587,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         Log.i(TAG, "afterSend");
         mGpsService.send();  // méthode envoie du service
         // messages de sortie et de remerciement
-        Toast.makeText(context, getString(R.string.thank_text1), Toast.LENGTH_LONG).show();
+        //Toast.makeText(context, getString(R.string.thank_text1), Toast.LENGTH_LONG).show();
         Toast.makeText(context, getString(R.string.thank_text2), Toast.LENGTH_LONG).show();
         // déconnexion du service
         Log.v(TAG, "afterSend - unbindService");

@@ -12,7 +12,7 @@ dependencies {
 
 android {
     compileSdkVersion 23
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '26.0.2'
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES'
         exclude 'META-INF/NOTICE'
@@ -24,8 +24,8 @@ android {
         applicationId "fr.cerema.rivages"
         minSdkVersion 10
         targetSdkVersion 22
-        versionCode 4
-        versionName "1.6"
+        versionCode 8
+        versionName "1.8"
     }
     configurations.all {
         resolutionStrategy {

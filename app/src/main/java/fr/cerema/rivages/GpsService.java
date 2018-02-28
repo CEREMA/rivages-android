@@ -510,6 +510,27 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
                                                 .addFileToUpload(currentfile.getPath(), "zip")
                                                 .setNotificationConfig(new UploadNotificationConfig())
                                                 .setMaxRetries(2)
+                                                .setDelegate(new UploadStatusDelegate() {
+                                                    @Override
+                                                    public void onProgress(Context context, UploadInfo uploadInfo) {
+
+                                                    }
+
+                                                    @Override
+                                                    public void onError(Context context, UploadInfo uploadInfo, Exception exception) {
+                                                        Toast.makeText(context, "Impossible d'uploader pour le moment. Veuillez réessayer plus tard.", Toast.LENGTH_LONG).show();
+                                                    }
+
+                                                    @Override
+                                                    public void onCompleted(Context context, UploadInfo uploadInfo, ServerResponse serverResponse) {
+                                                        currentfile.delete();
+                                                    }
+
+                                                    @Override
+                                                    public void onCancelled(Context context, UploadInfo uploadInfo) {
+
+                                                    }
+                                                })
                                                 .startUpload();
                                     } catch (Exception exc) {
                                         Log.e("AndroidUploadService", exc.getMessage(), exc);
@@ -822,61 +843,6 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
             // préparation de l'upload
             if (zipIsOk) {
 
-
-                /* SZ: On communique au serveur de téléchargement le MD5 du fichier zip et l'IMEI
-                   du smartphone et on reçoit en réponse une url de téléchargement unique
-                   POST /token
-                   param: md5 = string
-                   param: imei = string
-                   response: JSON
-                   {
-                        url: "https://upload-server.com/upload/unique-id"
-                   }
-                */
-/*
-                final Uri path = Uri.fromFile(exportDir);
-                String md5 = MD5.calculateMD5(new File(path.getPath()));
-                TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-                String deviceID = telephonyManager.getDeviceId();
-
-                AndroidNetworking.post("http://omneedia.com:5000/token")
-                .addBodyParameter("md5", md5)
-                .addBodyParameter("did", deviceID)
-                .build()
-                .getAsJSONObject(new JSONObjectRequestListener() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            String uploadId =
-                                    new MultipartUploadRequest(context, response.optString("url"))
-                                            .addFileToUpload(path.getPath(), "zip")
-                                            .setNotificationConfig(new UploadNotificationConfig())
-                                            .setMaxRetries(2)
-                                            .startUpload();
-                        } catch (Exception exc) {
-                            Log.e("AndroidUploadService", exc.getMessage(), exc);
-                        }
-                    }
-                    @Override
-                    public void onError(ANError error) {
-                        // handle error
-                    }
-                });
-
-                // SZ: On upload le fichier
-
-/*
-                try {
-                    String uploadId =
-                            new MultipartUploadRequest(context, "http://omneedia.com:5000/upload")
-                                    .addFileToUpload(path.getPath(), "zip")
-                                    .setNotificationConfig(new UploadNotificationConfig())
-                                    .setMaxRetries(2)
-                                    .startUpload();
-                } catch (Exception exc) {
-                    Log.e("AndroidUploadService", exc.getMessage(), exc);
-                }
-*/
                 postdata();
                 Log.i(TAG, "path:"+exportDir.toString());
 
