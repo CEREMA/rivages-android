@@ -724,12 +724,15 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
 
 
                         // Récupérer le bitmap brut
-                        Log.i(TAG, "pName="+photo.getAbsolutePath());
-                        Bitmap largeBitmap = BitmapFactory.decodeFile(photo.getAbsolutePath());
+                        // calcul des dimensions de l'image brute
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inJustDecodeBounds = true;
+                        BitmapFactory.decodeFile(photo.getAbsolutePath(), options);
+                        int height = options.outHeight;
+                        int width = options.outWidth;
 
                         // calculer le facteur de redimensionnement
-                        int width = largeBitmap.getWidth();
-                        int height = largeBitmap.getHeight();
+
                         int max = Math.max(width,height);
                         float scale = max/800f;
                         Log.i(TAG, "bitmap width = "+width);
@@ -737,8 +740,12 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
                         widthImage = (int)(width / scale);
                         heightImage = (int)(height / scale);
 
+                        // Récupérer le bitmap réduit directement pour ne pas saturer la mémoire
+                        Log.i(TAG, "pName="+photo.getAbsolutePath());
+                        Bitmap rawBitmap = decodeSampledBitmapFromFile(photo.getAbsolutePath(), widthImage, heightImage);
+                        Bitmap smallBitmap = Bitmap.createScaledBitmap(rawBitmap, widthImage, heightImage, true);
+
                         // Ecriture d'un bitmap compressé en jpg avec qualité 90% et les dimensions voulues
-                        Bitmap smallBitmap = Bitmap.createScaledBitmap(largeBitmap, widthImage, heightImage, true);
                         smallBitmap.compress(Bitmap.CompressFormat.JPEG, 90, fos);
                         fos.close();
 
@@ -765,24 +772,28 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
             if (hasLogo) {
 
                 try {
-                    //double RATE_LOGO = 37.65D;
+                    // calcul des dimensions finales du logo
                     String pathLogo = preferences.getString("LOGOPATH", "");
                     BitmapFactory.Options options = new BitmapFactory.Options();
-                    options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                    Bitmap rawLogo = BitmapFactory.decodeFile(pathLogo, options);
-                    int widthRawLogo = rawLogo.getWidth();
-                    int heightRawLogo = rawLogo.getHeight();
-                    Bitmap bmOverlay = Bitmap.createBitmap(widthRawLogo, heightRawLogo, rawLogo.getConfig());
-                    Canvas canvas = new Canvas(bmOverlay);
-                    canvas.drawColor(Color.WHITE);
-                    canvas.drawBitmap(rawLogo, 0, 0, null);
-                    Log.i(TAG, "paramètres : widthRawLogo="+widthRawLogo+"- heightRawLogo="+heightRawLogo);
+                    options.inJustDecodeBounds = true;
+                    BitmapFactory.decodeFile(pathLogo, options);
+                    int heightRawLogo = options.outHeight;
+                    int widthRawLogo = options.outWidth;
+                    Log.i(TAG, "heightRawLogo="+heightRawLogo+" - widthRawLogo="+widthRawLogo);
+
                     if (heightRawLogo!=0 && widthRawLogo!=0 ) {
                            widthLogo = (int) (Math.sqrt((143 * 67 * widthRawLogo) / ((double) heightRawLogo)));
                            heightLogo = (int) ((widthLogo * heightRawLogo * 1D) / (widthRawLogo));
                        }
+                    // création d'un logo réduit sur fond blanc
+                    Bitmap bitmapLogo1 = decodeSampledBitmapFromFile(pathLogo, widthLogo, heightLogo);
+                    Bitmap scaledLogo = Bitmap.createScaledBitmap(bitmapLogo1, widthLogo, heightLogo, true);
+                    Bitmap bmOverlay = Bitmap.createBitmap(widthLogo, heightLogo, scaledLogo.getConfig());
+                    Canvas canvas = new Canvas(bmOverlay);
+                    canvas.drawColor(Color.WHITE);
+                    canvas.drawBitmap(scaledLogo, 0, 0, null);
+                    Log.i(TAG, "paramètres : widthRawLogo="+widthRawLogo+"- heightRawLogo="+heightRawLogo);
 
-                    Log.i(TAG, "size : widthLogo="+widthLogo+"- heightLogo="+heightLogo);
 
                     raw_file_names[i] = String.format(Locale.FRANCE,
                             "%1$s/rivages_%2$s_logo.jpg",
@@ -795,12 +806,21 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
                     FileOutputStream fos = new FileOutputStream(new File(raw_file_names[i]));
 
                     // Ecriture d'un bitmap compressé en jpg avec qualité 90% et les dimensions voulues
-                    Bitmap firstBitmap = Bitmap.createScaledBitmap(bmOverlay, widthLogo*4, heightLogo*4, true);
-                    firstBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos1);
-                    Bitmap smallBitmap = Bitmap.createScaledBitmap(firstBitmap, widthLogo, heightLogo, true);
-                    smallBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
-                    fos1.close();
-                    fos.close();
+                    // L'enregistrement en multipliant par 4 assure une meilleure qualité finale
+                    // En cas d'out of memory, on reste sur l'image initiale
+                    Bitmap firstBitmap=null;
+                    try {
+                        firstBitmap = Bitmap.createScaledBitmap(bmOverlay, widthLogo * 4, heightLogo * 4, true);
+                        firstBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos1);
+                        Bitmap smallBitmap = Bitmap.createScaledBitmap(firstBitmap, widthLogo, heightLogo, true);
+                        smallBitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);}
+                    catch (Exception e){
+                        bmOverlay.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+                    }
+                    finally {
+                        fos1.close();
+                        fos.close();
+                    }
                     i++;
                     j++;
                 }
@@ -900,5 +920,42 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
                 newExif.setAttribute(attributes[i], value);
         }
         newExif.saveAttributes();
+    }
+
+    public int calculateInSampleSize(
+            BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        // Raw height and width of image
+        final int height = options.outHeight;
+        final int width = options.outWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth) {
+
+            final int halfHeight = height / 2;
+            final int halfWidth = width / 2;
+
+            // Calculate the largest inSampleSize value that is a power of 2 and keeps both
+            // height and width larger than the requested height and width.
+            while ((halfHeight / inSampleSize) > reqHeight
+                    && (halfWidth / inSampleSize) > reqWidth) {
+                inSampleSize *= 2;
+            }
+        }
+        return inSampleSize;
+    }
+
+
+    public Bitmap decodeSampledBitmapFromFile(String pathName, int reqWidth, int reqHeight) {
+
+        // First decode with inJustDecodeBounds=true to check dimensions
+        final BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        BitmapFactory.decodeFile(pathName, options);
+        // Calculate inSampleSize
+        options.inSampleSize = calculateInSampleSize(options, reqWidth, reqHeight);
+
+        // Decode bitmap with inSampleSize set
+        options.inJustDecodeBounds = false;
+        return BitmapFactory.decodeFile(pathName, options);
     }
 }

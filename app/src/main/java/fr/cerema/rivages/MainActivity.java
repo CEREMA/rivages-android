@@ -71,6 +71,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 // Cette activité affiche une carte via l'API OSMDROID 5.1, ainsi que 4 boutons, et un ensemble de données concernant la géolocalisation
 // Elle fait appel à un service en tache de fond, GpsService, et à un BroadCastReceiver, qui lui permet d'être informé de la disponibilité de nouvelles données à afficher
 
+// Stéphane Zucatti - Cerema Med / SG / SII - 27 février 2018
+// Version 1.9
+// ADD: Post user data to https server
 
 public class MainActivity extends Activity implements View.OnClickListener{
 
@@ -108,6 +111,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private static final int REQUEST_IMAGE_CAPTURE=1;
     private static final int  PICK_LOGO1 = 97;
     private static final int  PICK_LOGO2 = 98;
+    private static final int  PICK_LOGO_KITKAT1 = 99;
+    private static final int  PICK_LOGO_KITKAT2 = 100;
 
 
 
@@ -620,9 +625,18 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     private void chooseLogo(boolean phot) {
         Log.i(TAG, "chooseLogo - phot="+phot);
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("image/*");
-        startActivityForResult(intent, (phot)? PICK_LOGO1 : PICK_LOGO2);
+
+        if (Build.VERSION.SDK_INT <19){
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(Intent.createChooser(intent, getResources().getString(R.string.select_picture)),(phot)? PICK_LOGO1 : PICK_LOGO2);
+        } else {
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("image/*");
+            startActivityForResult(intent, (phot)? PICK_LOGO_KITKAT1 : PICK_LOGO_KITKAT2);
+        }
     }
 
 
@@ -740,8 +754,44 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 Toast.makeText(context, getString(R.string.photoAdded), Toast.LENGTH_SHORT).show();
             }
 
-        if ( (requestCode == PICK_LOGO1 || requestCode == PICK_LOGO2) && resultCode == RESULT_OK) {
+        if ( (requestCode == PICK_LOGO1 || requestCode == PICK_LOGO2
+        || requestCode == PICK_LOGO_KITKAT1 || requestCode == PICK_LOGO_KITKAT2) && resultCode == RESULT_OK) {
 
+            String filePath = "";
+
+            if( (requestCode == PICK_LOGO_KITKAT1 || requestCode == PICK_LOGO_KITKAT2)){
+
+                Uri originalUri = data.getData();
+
+                final int takeFlags = data.getFlags()
+                        & (Intent.FLAG_GRANT_READ_URI_PERMISSION
+                        | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                // Check for the freshest data.
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    //noinspection WrongConstant
+                    getContentResolver().takePersistableUriPermission(originalUri, takeFlags);
+                }
+
+                /* now extract ID from Uri path using getLastPathSegment() and then split with ":"
+                then call get Uri to for Internal storage or External storage for media I have used getUri()
+                */
+
+                String id = originalUri.getLastPathSegment().split(":")[1];
+                final String[] imageColumns = {MediaStore.Images.Media.DATA };
+                final String imageOrderBy = null;
+
+                Uri uri = getUri();
+
+                Cursor imageCursor = managedQuery(uri, imageColumns,
+                        MediaStore.Images.Media._ID + "="+id, null, imageOrderBy);
+
+                if (imageCursor.moveToFirst()) {
+                    filePath = imageCursor.getString(imageCursor.getColumnIndex(MediaStore.Images.Media.DATA));
+                }
+
+            } else {
+                // for older version use existing code here
+                
             Uri selectedLogo = data.getData();
 
             Log.i(TAG, "reception du résultat du choix de logo : URI=" + selectedLogo.toString());
@@ -754,32 +804,41 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 cursor.moveToFirst();
                 int columnIndex = 0;
                 columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                String filePath = cursor.getString(columnIndex);
+                filePath = cursor.getString(columnIndex);
                 cursor.close();
-
+            }
+            }
                 Log.i(TAG, "logoPath="+filePath);
-
+            
                 // stockage du chemin du logo dans les préférences
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putString("LOGOPATH", filePath);
                 editor.apply();
 
                 // mettre le logo
-                int factor = (getResources().getDimensionPixelSize(R.dimen.picture));
-                btnLogo.setImageBitmap(decodeSampledBitmap(filePath, factor, factor));
+                int logoSize = (getResources().getDimensionPixelSize(R.dimen.picture));
+                btnLogo.setImageBitmap(decodeSampledBitmap(filePath, logoSize, logoSize));
                 btnLogo.setVisibility(View.VISIBLE);
             }
 
-            if (requestCode == PICK_LOGO1) {
+            if (requestCode == PICK_LOGO1 || requestCode == PICK_LOGO_KITKAT1) {
                 afterSend();
             }
-        }
 
-        if ( (requestCode == PICK_LOGO1 || requestCode == PICK_LOGO2) && resultCode != RESULT_OK) {
+
+        if ( (requestCode == PICK_LOGO1 || requestCode == PICK_LOGO2 || requestCode == PICK_LOGO_KITKAT1 || requestCode == PICK_LOGO_KITKAT2) && resultCode != RESULT_OK) {
             Toast.makeText(context, getString(R.string.invalidLogo), Toast.LENGTH_LONG).show();
         }
     }
 
+    // By using this method get the Uri of Internal/External Storage for Media
+    private Uri getUri() {
+        String state = Environment.getExternalStorageState();
+        if(!state.equalsIgnoreCase(Environment.MEDIA_MOUNTED))
+            return MediaStore.Images.Media.INTERNAL_CONTENT_URI;
+
+        return MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+    }
 
     private ServiceConnection mConnection = new ServiceConnection() {
 
