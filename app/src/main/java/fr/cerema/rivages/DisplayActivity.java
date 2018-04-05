@@ -24,8 +24,19 @@ public class DisplayActivity extends Activity {
 
         webView.getSettings().setBuiltInZoomControls(true);
 
-        if (getString(R.string.langage).equals("en")) webView.loadUrl("file:///android_asset/protocole_en.html");
-        else webView.loadUrl("file:///android_asset/protocole_fr.html");
+        String langage = getString(R.string.langage);
+
+        switch (langage) {
+            case "en":
+                webView.loadUrl("file:///android_asset/protocole_en.html");
+                break;
+            case "de":
+                webView.loadUrl("file:///android_asset/protocole_de.html");
+                break;
+            default:
+                webView.loadUrl("file:///android_asset/protocole_fr.html");
+                break;
+        }
     }
 
     @Override

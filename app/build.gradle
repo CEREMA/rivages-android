@@ -8,6 +8,7 @@ dependencies {
     compile 'net.gotev:uploadservice-okhttp:3.2.3'
     compile 'com.amitshekhar.android:android-networking:1.0.0'
     compile 'com.amitshekhar.android:jackson-android-networking:1.0.0'
+    compile "me.leolin:ShortcutBadger:1.1.21@aar"
 }
 
 android {
@@ -24,8 +25,8 @@ android {
         applicationId "fr.cerema.rivages"
         minSdkVersion 10
         targetSdkVersion 22
-        versionCode 9
-        versionName "1.9"
+        versionCode 92
+        versionName "1.92"
     }
     configurations.all {
         resolutionStrategy {

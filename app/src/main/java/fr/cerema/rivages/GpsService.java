@@ -580,10 +580,12 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
             try {
                 FileWriter writer = new FileWriter(new File(raw_file_names[0]), false);
                 writer.append(android.os.Build.MODEL);
+                writer.append('|');
+                writer.append(Locale.getDefault().getDisplayLanguage());
                 writer.flush();
                 writer.close();
             } catch (IOException e) {
-                Log.e(TAG, "Error Writting Path", e);
+                Log.e(TAG, "Error Writing Path", e);
             }
 
             if (hasNmeaData) {

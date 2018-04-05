@@ -65,6 +65,7 @@ import java.util.Locale;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+//import me.leolin.shortcutbadger.ShortcutBadger;
 
 // Christophe MOULIN - Cerema Med / DREC / SVGC - 23 juin 2016
 // Version 0.3 - 31/08/2016
@@ -239,6 +240,27 @@ public class MainActivity extends Activity implements View.OnClickListener{
             btnLogo.setVisibility(View.VISIBLE);
             Log.i(TAG, "setting btnLogo");
         }
+/*
+        int badgeCount = 0;
+
+        String _path = Environment.getExternalStorageDirectory().toString()+"/Documents";
+        Log.d("Files", "Path: " + _path);
+        File directory = new File(_path);
+        if(directory.exists()){
+            File[] files = directory.listFiles();
+            Log.d("Files", "list_files: " + files.length);
+            try {
+                badgeCount = files.length;
+            } catch (NumberFormatException e) {
+                Toast.makeText(getApplicationContext(), "Error input", Toast.LENGTH_SHORT).show();
+            }
+
+            boolean success = ShortcutBadger.applyCount(MainActivity.this, badgeCount);
+        };
+*/
+
+
+
     }
 
 
