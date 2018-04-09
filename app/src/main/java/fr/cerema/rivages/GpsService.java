@@ -60,6 +60,8 @@ import com.androidnetworking.interfaces.JSONObjectRequestListener;
 import org.json.JSONObject;
 import com.androidnetworking.error.ANError;
 
+import me.leolin.shortcutbadger.ShortcutBadger;
+
 
 // Christophe MOULIN - Cerema Med / DREC / SVGC - 23 juin 2016
 //
@@ -439,6 +441,10 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
             //noinspection unchecked
             mSave.execute(segments);
             exit();
+        } else {
+            Save mSave = new Save();
+            mSave.postdata();
+            exit();
         }
     }
 
@@ -474,7 +480,6 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
         }
 
         public void postdata() {
-            //Toast.makeText(context, getString(R.string.no_points), Toast.LENGTH_LONG).show();
             String path = Environment.getExternalStorageDirectory().toString()+"/Documents";
             Log.d("Files", "Path: " + path);
             File directory = new File(path);
@@ -524,6 +529,22 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
                                                     @Override
                                                     public void onCompleted(Context context, UploadInfo uploadInfo, ServerResponse serverResponse) {
                                                         currentfile.delete();
+                                                        // display badge on some device that support it!
+
+                                                        int badgeCount = 0;
+                                                        String _path = Environment.getExternalStorageDirectory().toString()+"/Documents";
+                                                        File directory = new File(_path);
+                                                        File[] files = directory.listFiles();
+                                                        if (files!=null) {
+                                                            for (int z = 0; z < files.length; z++) {
+                                                                final File currentfile = files[z];
+                                                                if (currentfile.getName().indexOf("rivages_") > -1) {
+                                                                    badgeCount++;
+                                                                }
+                                                            }
+                                                        };
+
+                                                        boolean success = ShortcutBadger.applyCount(context, badgeCount);
                                                     }
 
                                                     @Override
@@ -864,6 +885,23 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
 
             // préparation de l'upload
             if (zipIsOk) {
+
+                // display badge on some device that support it!
+
+                int badgeCount = 0;
+                String _path = Environment.getExternalStorageDirectory().toString()+"/Documents";
+                File directory = new File(_path);
+                File[] files = directory.listFiles();
+                if (files!=null) {
+                    for (int z = 0; z < files.length; z++) {
+                        final File currentfile = files[z];
+                        if (currentfile.getName().indexOf("rivages_") > -1) {
+                            badgeCount++;
+                        }
+                    }
+                };
+
+                boolean success = ShortcutBadger.applyCount(context, badgeCount);
 
                 postdata();
                 Log.i(TAG, "path:"+exportDir.toString());

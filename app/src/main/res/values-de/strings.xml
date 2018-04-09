@@ -64,5 +64,7 @@
     <string name="type_trait_nouveau_segment">Neuer Abschnitt</string>
     <string name="type_trait_segment_actuel">Fortfahren</string>
 
+    <string name="reminder">Es befinden sich %n Dateien in der Warteschlange! Denke daran, hochzuladen!</string>
+
 </resources>
 

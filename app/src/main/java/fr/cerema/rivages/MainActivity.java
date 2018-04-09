@@ -43,7 +43,10 @@ import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
 
 import net.gotev.uploadservice.MultipartUploadRequest;
+import net.gotev.uploadservice.ServerResponse;
+import net.gotev.uploadservice.UploadInfo;
 import net.gotev.uploadservice.UploadNotificationConfig;
+import net.gotev.uploadservice.UploadStatusDelegate;
 
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
@@ -65,7 +68,7 @@ import java.util.Locale;
 import java.util.Queue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-//import me.leolin.shortcutbadger.ShortcutBadger;
+import me.leolin.shortcutbadger.ShortcutBadger;
 
 // Christophe MOULIN - Cerema Med / DREC / SVGC - 23 juin 2016
 // Version 0.3 - 31/08/2016
@@ -73,8 +76,12 @@ import java.util.concurrent.atomic.AtomicBoolean;
 // Elle fait appel à un service en tache de fond, GpsService, et à un BroadCastReceiver, qui lui permet d'être informé de la disponibilité de nouvelles données à afficher
 
 // Stéphane Zucatti - Cerema Med / SG / SII - 27 février 2018
-// Version 1.9
+// Version 1.93
 // ADD: Post user data to https server
+// ADD: lang in file
+// ADD: dynamic versioning
+// ADD: reminder to upload
+// ADD: badge counter on some device
 
 public class MainActivity extends Activity implements View.OnClickListener{
 
@@ -240,25 +247,71 @@ public class MainActivity extends Activity implements View.OnClickListener{
             btnLogo.setVisibility(View.VISIBLE);
             Log.i(TAG, "setting btnLogo");
         }
-/*
-        int badgeCount = 0;
 
+        // display badge on some device that support it!
+
+        int badgeCount = 0;
         String _path = Environment.getExternalStorageDirectory().toString()+"/Documents";
-        Log.d("Files", "Path: " + _path);
         File directory = new File(_path);
-        if(directory.exists()){
-            File[] files = directory.listFiles();
-            Log.d("Files", "list_files: " + files.length);
-            try {
-                badgeCount = files.length;
-            } catch (NumberFormatException e) {
-                Toast.makeText(getApplicationContext(), "Error input", Toast.LENGTH_SHORT).show();
+        File[] files = directory.listFiles();
+        if (files!=null) {
+            for (int i = 0; i < files.length; i++) {
+                final File currentfile = files[i];
+                if (currentfile.getName().indexOf("rivages_") > -1) {
+                    badgeCount++;
+                }
+            }
+        };
+
+        boolean success = ShortcutBadger.applyCount(MainActivity.this, badgeCount);
+
+        // display a reminder
+
+        if (badgeCount>0) {
+
+            SharedPreferences prefs = PreferenceManager
+                    .getDefaultSharedPreferences(MainActivity.this);
+            boolean dialog_status = prefs
+                    .getBoolean("dialog_status", false);
+            if (!dialog_status) {
+
+                View checkBoxView = View.inflate(this, R.layout.checkbox, null);
+                CheckBox checkBox = (CheckBox) checkBoxView.findViewById(R.id.checkbox);
+                int id=Resources.getSystem().getIdentifier("btn_check_holo_light", "drawable", "android");
+                checkBox.setButtonDrawable(id);
+
+                checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putBoolean("dialog_status",isChecked);
+
+                    }
+                });
+
+                checkBox.setText(getString(R.string.logo_ask));
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Informations")
+                        .setMessage(getString(R.string.reminder).replace("%n",String.valueOf(badgeCount)))
+                        .setView(checkBoxView)
+                        .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        });
+                Dialog dialog = builder.create();
+                dialog.show();
+
+
             }
 
-            boolean success = ShortcutBadger.applyCount(MainActivity.this, badgeCount);
-        };
-*/
 
+
+        }
 
 
     }
@@ -279,7 +332,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
         if(hasToRestart){
             hasToRestart=false;
-            startAndBindService();
+
         }
 
         // enregistrer le broadcast receiver dès apparition de l'affichage
@@ -397,27 +450,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 break;
         }
     }
-
-/*
-    public boolean onLongClick(View v) {
-
-        switch (v.getId()) {
-            case R.id.btn_main_4:
-                // effacer du chemin du logo dans les préférences
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString("LOGOPATH", "");
-                editor.apply();
-                Toast.makeText(context, getString(R.string.logo_removed), Toast.LENGTH_LONG).show();
-                // Vibration de callback
-                Vibrator vib = (Vibrator) this.getApplicationContext().getSystemService(VIBRATOR_SERVICE);
-                vib.vibrate(100);
-                btnLogo.setImageBitmap(null);
-                break;
-        }
-        return true;
-    }
-    */
-
 
     private void displayInfo() {
         startActivity(new Intent(this, DisplayActivity.class));
@@ -538,58 +570,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
         return image;
     }
 
-    public void postdata() {
-        //Toast.makeText(context, getString(R.string.no_points), Toast.LENGTH_LONG).show();
-        String path = Environment.getExternalStorageDirectory().toString()+"/Documents";
-        Log.d("Files", "Path: " + path);
-        File directory = new File(path);
-        File[] files = directory.listFiles();
-        Log.d("Files", "Size: "+ files.length);
-        TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        String deviceID = telephonyManager.getDeviceId();
-        Log.d("Files",deviceID);
-        for (int i = 0; i < files.length; i++)
-        {
-            final File currentfile=files[i];
-            if (currentfile.getName().indexOf("rivages_")>-1) {
-                Log.d("Files", "FileName:" + files[i].getName());
-                String md5 = MD5.calculateMD5(files[i]);
-                Log.d("Files", md5);
-                AndroidNetworking.post("https://rivages.siipro.fr/token")
-                        .addBodyParameter("md5", md5)
-                        .addBodyParameter("did", deviceID)
-                        .addBodyParameter("nam", currentfile.getName())
-                        .setPriority(Priority.MEDIUM)
-                        .build()
-                        .getAsJSONObject(new JSONObjectRequestListener() {
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                try {
-                                    Log.d("Files", response.toString(4));
-                                    Log.d("Files", response.optString("url"));
-                                } catch (Exception exc) {
-                                    Log.d("Files", "failed.");
-                                }
-                                try {
-                                    String uploadId = new MultipartUploadRequest(context, response.optString("url"))
-                                            .addFileToUpload(currentfile.getPath(), "zip")
-                                            .setNotificationConfig(new UploadNotificationConfig())
-                                            .setMaxRetries(2)
-                                            .startUpload();
-                                } catch (Exception exc) {
-                                    Log.e("AndroidUploadService", exc.getMessage(), exc);
-                                }
-                            }
-
-                            @Override
-                            public void onError(ANError error) {
-                                // handle error
-                                //Log.d("Files",error.toString());
-                            }
-                        });
-            }
-        }
-    }
     private void send() {
         // envoi des données
         if (bound) {
@@ -604,7 +584,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 else afterSend();
             }
             else {
-                postdata();
+                exiting = true;
+                afterSend();
             }
         }
     }
@@ -622,6 +603,24 @@ public class MainActivity extends Activity implements View.OnClickListener{
         // rendre le bouton 2 insensible pour éviter de redéclencher la méthode par erreur (résultat incertain !)
         //btn2.setOnClickListener(null);
         Log.v(TAG, "afterSend - finish");
+
+        // display badge on some device that support it!
+
+        int badgeCount = 0;
+        String _path = Environment.getExternalStorageDirectory().toString()+"/Documents";
+        File directory = new File(_path);
+        File[] files = directory.listFiles();
+        if (files!=null) {
+            for (int i = 0; i < files.length; i++) {
+                final File currentfile = files[i];
+                if (currentfile.getName().indexOf("rivages_") > -1) {
+                    badgeCount++;
+                }
+            }
+        };
+
+        boolean success = ShortcutBadger.applyCount(MainActivity.this, badgeCount);
+
         finish();
     }
 

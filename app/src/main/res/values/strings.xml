@@ -64,4 +64,6 @@
     <string name="type_trait_nouveau_segment">New segment</string>
     <string name="type_trait_segment_actuel">Continue</string>
 
+    <string name="reminder">There are %n files in the queue! Please upload!</string>
+
 </resources>
