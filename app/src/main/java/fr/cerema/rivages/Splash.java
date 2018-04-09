@@ -5,7 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-
+import android.widget.TextView;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import java.io.File;
 
 
@@ -14,6 +16,7 @@ public class Splash extends Activity {
     private final String TAG = this.getClass().getSimpleName();
 
     private Context context;
+    private TextView rivages_version;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +26,20 @@ public class Splash extends Activity {
         // penser à effacer le répertoire tampon au lancement de l'appli (splash)
 
         context =this ;
+
+        rivages_version = (TextView) findViewById(R.id.tv_splash3);
+
+        PackageManager manager = context.getPackageManager();
+        PackageInfo info = null;
+        try {
+            info = manager.getPackageInfo(
+                    context.getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        String version = info.versionName;
+
+        rivages_version.setText("version " +version);
 
         Handler x = new Handler();
         x.postDelayed(new splashhandler(), 4000);
