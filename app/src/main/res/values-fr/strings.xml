@@ -64,6 +64,6 @@
     <string name="thank_text1">L\'envoi va se faire par courriel.</string>
     <string name="thank_text2">Merci pour votre participation à la connaissance du trait de côte!</string>
 
-    <string name="reminder">Il y a %n fichiers dans la file d\'attente ! Pensez à uploader !</string>
+    <string name="reminder">Il y a %n fichiers dans la file d\'attente ! N\'oubliez pas d'envoyer vos fichiers !</string>
 
 </resources>

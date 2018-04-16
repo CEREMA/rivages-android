@@ -32,6 +32,10 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+
 import org.osmdroid.util.GeoPoint;
 
 import java.io.File;
@@ -68,7 +72,8 @@ import me.leolin.shortcutbadger.ShortcutBadger;
 // GpsService - service lancé par l'activité et vivant en tache de fond
 // il est démarré, lié et au premier plan, ce qui le rend non éligible à la destruction par le système en cas de ressources faibles
 
-
+// Stéphane Zucatti - Cerema Med / SG / SII
+// version 1.94
 
 public class GpsService extends Service  implements LocationListener,GpsStatus.NmeaListener,GpsStatus.Listener {
 
@@ -479,6 +484,23 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
             progressDialog.show();
         }
 
+        public String getMd5Hash(String input) {
+            try {
+                MessageDigest md = MessageDigest.getInstance("MD5");
+                byte[] messageDigest = md.digest(input.getBytes());
+                BigInteger number = new BigInteger(1, messageDigest);
+                String md5 = number.toString(16);
+
+                while (md5.length() < 32)
+                    md5 = "0" + md5;
+
+                return md5;
+            } catch (NoSuchAlgorithmException e) {
+                Log.e("MD5", e.getLocalizedMessage());
+                return null;
+            }
+        }
+
         public void postdata() {
             String path = Environment.getExternalStorageDirectory().toString()+"/Documents";
             Log.d("Files", "Path: " + path);
@@ -494,10 +516,11 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
                 if (currentfile.getName().indexOf("rivages_")>-1) {
                     Log.d("Files", "FileName:" + files[i].getName());
                     String md5 = MD5.calculateMD5(files[i]);
+                    String deviceIDEncrypted = getMd5Hash(deviceID);
                     Log.d("Files", md5);
                     AndroidNetworking.post("https://rivages.siipro.fr/token")
                             .addBodyParameter("md5", md5)
-                            .addBodyParameter("did", deviceID)
+                            .addBodyParameter("did", deviceIDEncrypted)
                             .addBodyParameter("nam", currentfile.getName())
                             .setPriority(Priority.MEDIUM)
                             .build()
