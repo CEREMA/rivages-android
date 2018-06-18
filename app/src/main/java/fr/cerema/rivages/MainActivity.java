@@ -581,17 +581,26 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 if (mGpsService.hasPhoto() && preferences.getString("LOGOPATH", "").length()<5 && !preferences.getBoolean("ASKLOGO", false)) {
                     logoDialog(true);
                 }
-                else afterSend();
+                else {
+                    try {
+                    afterSend();
+                    } catch(Exception e) {
+
+                    };
+                }
             }
             else {
                 exiting = true;
-                afterSend();
+                try {
+                afterSend();} catch(Exception e) {
+
+                };
             }
         }
     }
 
 
-    private void afterSend() {
+    private void afterSend() throws Exception {
         Log.i(TAG, "afterSend");
         mGpsService.send();  // méthode envoie du service
         // messages de sortie et de remerciement
@@ -599,9 +608,13 @@ public class MainActivity extends Activity implements View.OnClickListener{
         Toast.makeText(context, getString(R.string.thank_text2), Toast.LENGTH_LONG).show();
         // déconnexion du service
         Log.v(TAG, "afterSend - unbindService");
-        unbindService(mConnection);
+        try {
+            unbindService(mConnection);
+        } catch(Exception e) {
+
+        };
         // rendre le bouton 2 insensible pour éviter de redéclencher la méthode par erreur (résultat incertain !)
-        //btn2.setOnClickListener(null);
+        btn2.setOnClickListener(null);
         Log.v(TAG, "afterSend - finish");
 
         // display badge on some device that support it!
@@ -753,7 +766,14 @@ public class MainActivity extends Activity implements View.OnClickListener{
                         editor.putString("LOGOPATH", "");
                         editor.apply();
                         btnLogo.setVisibility(View.INVISIBLE);
-                        if (hasPhoto) afterSend();
+                        if (hasPhoto) {
+                            try {
+                                afterSend();
+                            } catch(Exception e) {
+
+                            }
+
+                        }
                         dialog.dismiss();
                     }
                 })
@@ -843,7 +863,11 @@ public class MainActivity extends Activity implements View.OnClickListener{
             }
 
             if (requestCode == PICK_LOGO1 || requestCode == PICK_LOGO_KITKAT1) {
+            try {
                 afterSend();
+            } catch(Exception e) {
+
+            }
             }
 
 
