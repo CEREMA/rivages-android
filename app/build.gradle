@@ -24,9 +24,9 @@ android {
     defaultConfig {
         applicationId "fr.cerema.rivages"
         minSdkVersion 10
-        targetSdkVersion 22
-        versionCode 95
-        versionName "1.95"
+        targetSdkVersion 23
+        versionCode 200
+        versionName "1.995"
     }
     configurations.all {
         resolutionStrategy {

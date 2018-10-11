@@ -32,6 +32,8 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Toast;
 
+import org.json.JSONException;
+
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -551,6 +553,41 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
 
                                                     @Override
                                                     public void onCompleted(Context context, UploadInfo uploadInfo, ServerResponse serverResponse) {
+                                                        String resp = serverResponse.getBodyAsString();
+
+                                                        String resp = serverResponse.getBodyAsString();
+                                                        Log.d("FILE_INFO",resp);
+                                                        try {
+                                                            JSONObject response = new JSONObject(resp);
+                                                            String hash = response.getString("hash");
+
+
+                                                            if (hash.equals(md5)) {
+                                                                // Si le hash du serveur est le même que le hash du fichier, on le supprime
+                                                                currentfile.delete();
+                                                                Log.d("FILE_INFO","working");
+                                                                int badgeCount = 0;
+                                                                String _path = Environment.getExternalStorageDirectory().toString()+"/Documents";
+                                                                File directory = new File(_path);
+                                                                File[] files = directory.listFiles();
+                                                                if (files!=null) {
+                                                                    for (int z = 0; z < files.length; z++) {
+                                                                        final File currentfile = files[z];
+                                                                        if (currentfile.getName().indexOf("rivages_") > -1) {
+                                                                            badgeCount++;
+                                                                        }
+                                                                    }
+                                                                };
+
+                                                                boolean success = ShortcutBadger.applyCount(context, badgeCount);
+                                                            } else {
+                                                                Toast.makeText(context, "Impossible d'uploader pour le moment. Veuillez réessayer plus tard.", Toast.LENGTH_LONG).show();
+                                                            }
+
+                                                        } catch (JSONException e) {
+                                                            Toast.makeText(context, "Impossible d'uploader pour le moment. Veuillez réessayer plus tard.", Toast.LENGTH_LONG).show();
+                                                        }
+/*
                                                         currentfile.delete();
                                                         // display badge on some device that support it!
 
@@ -567,7 +604,7 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
                                                             }
                                                         };
 
-                                                        boolean success = ShortcutBadger.applyCount(context, badgeCount);
+                                                        boolean success = ShortcutBadger.applyCount(context, badgeCount);*/
                                                     }
 
                                                     @Override
