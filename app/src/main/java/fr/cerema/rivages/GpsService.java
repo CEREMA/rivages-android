@@ -517,7 +517,7 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
                 final File currentfile=files[i];
                 if (currentfile.getName().indexOf("rivages_")>-1) {
                     Log.d("Files", "FileName:" + files[i].getName());
-                    String md5 = MD5.calculateMD5(files[i]);
+                    final String md5 = MD5.calculateMD5(files[i]);
                     String deviceIDEncrypted = getMd5Hash(deviceID);
                     Log.d("Files", md5);
                     AndroidNetworking.post("https://rivages.siipro.fr/token")
@@ -555,7 +555,6 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
                                                     public void onCompleted(Context context, UploadInfo uploadInfo, ServerResponse serverResponse) {
                                                         String resp = serverResponse.getBodyAsString();
 
-                                                        String resp = serverResponse.getBodyAsString();
                                                         Log.d("FILE_INFO",resp);
                                                         try {
                                                             JSONObject response = new JSONObject(resp);
