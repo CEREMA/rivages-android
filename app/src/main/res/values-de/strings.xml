@@ -65,6 +65,8 @@
     <string name="type_trait_segment_actuel">Fortfahren</string>
 
     <string name="reminder">Es befinden sich %n Dateien in der Warteschlange! Denke daran, hochzuladen!</string>
-
+    <string name="ok">OK</string>
+    <string name="cancel">Annuler</string>
+    <string name="permission_message">Permission message</string>
 </resources>
 

@@ -9,10 +9,11 @@ dependencies {
     compile 'com.amitshekhar.android:android-networking:1.0.0'
     compile 'com.amitshekhar.android:jackson-android-networking:1.0.0'
     compile "me.leolin:ShortcutBadger:1.1.21@aar"
+    compile 'com.nabinbhandari.android:permissions:3.8'
 }
 
 android {
-    compileSdkVersion 23
+    compileSdkVersion 26
     buildToolsVersion '26.0.2'
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES'
@@ -23,16 +24,20 @@ android {
     }
     defaultConfig {
         applicationId "fr.cerema.rivages"
-        minSdkVersion 10
-        targetSdkVersion 23
-        versionCode 200
-        versionName "1.995"
+        minSdkVersion 26
+        targetSdkVersion 26
+        versionCode 201
+        versionName "1.998"
     }
     configurations.all {
         resolutionStrategy {
             force 'com.android.support:support-v4:23.1.1'
             force 'com.android.support:appcompat-v7:23.1.1'
         }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     buildTypes {
         release {

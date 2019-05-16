@@ -66,4 +66,8 @@
 
     <string name="reminder">There are %n files in the queue! Please upload!</string>
 
+    <string name="ok">OK</string>
+    <string name="cancel">Annuler</string>
+    <string name="permission_message">Permission message</string>
+
 </resources>

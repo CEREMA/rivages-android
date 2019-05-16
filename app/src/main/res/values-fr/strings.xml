@@ -65,5 +65,7 @@
     <string name="thank_text2">Merci pour votre participation à la connaissance du trait de côte!</string>
 
     <string name="reminder">Il y a %n fichiers dans la file d\'attente ! N\'oubliez pas d'envoyer vos fichiers !</string>
-
+    <string name="ok">OK</string>
+    <string name="cancel">Annuler</string>
+    <string name="permission_message">Permission message</string>
 </resources>

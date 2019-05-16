@@ -1,5 +1,6 @@
 package fr.cerema.rivages;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -26,10 +27,12 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
+import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.View;
+import android.webkit.PermissionRequest;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -70,6 +73,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import me.leolin.shortcutbadger.ShortcutBadger;
 
+import com.nabinbhandari.android.permissions.*;
+
 // Christophe MOULIN - Cerema Med / DREC / SVGC - 23 juin 2016
 // Version 0.3 - 31/08/2016
 // Cette activité affiche une carte via l'API OSMDROID 5.1, ainsi que 4 boutons, et un ensemble de données concernant la géolocalisation
@@ -84,6 +89,8 @@ import me.leolin.shortcutbadger.ShortcutBadger;
 // ADD: badge counter on some device
 
 public class MainActivity extends Activity implements View.OnClickListener{
+
+
 
     // pour les journaux Log
     private final String TAG = this.getClass().getSimpleName();
@@ -146,7 +153,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
         // affichage de la vue principale
         setContentView(R.layout.activity_main);
 
+
+
         context = this ;
+
 
         // initialisation du tableau paths, ou sont stockés les segments rouges affichés sur la cartes
         paths = new ArrayList<>();
@@ -172,48 +182,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
         btn8 = (Button) findViewById(R.id.btn_main_8);
         mapView = (MapView) findViewById(R.id.mv_compteur);
 
-
-        // OSMdroid MapView
-
-        // enregistrement de l'application auprès de OSMDROID
-        OpenStreetMapTileProviderConstants.setUserAgentValue(BuildConfig.APPLICATION_ID);
-
-
-        // nécessite la désactivation de l'accélération graphique matérielle à partir de Honeycomb
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-            mapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        }
-
-        mOsmvController = mapView.getController();
-
-        // fonds de plan MAPNIK
-        mapView.setTileSource(TileSourceFactory.MAPNIK);
-
-        // permet le zoom à deux doigts
-        mapView.setBuiltInZoomControls(false);
-        mapView.setMultiTouchControls(true);
-
-        // centrer sur la France
-        mOsmvController.setZoom(6);
-        GeoPoint startingPoint = new GeoPoint(46177548, 2639465);
-        mOsmvController.setCenter(startingPoint);
-
-        // échelle graphique
-        ScaleBarOverlay myScaleBarOverlay = new ScaleBarOverlay(mapView);
-        mapView.getOverlays().add(myScaleBarOverlay);
-
-        // listener
-        mapView.setMapListener(new MapAdapter() {
-            @Override
-            public boolean onScroll(ScrollEvent event) {
-                stopFollowing = true ;
-                timeStop = System.currentTimeMillis();
-                return super.onScroll(event);
-            }
-        });
-
-        myLocationOverlayExists = new AtomicBoolean(false); // ajouté à V0.3 pour gérer l'affichage de la position
-
         // écouteurs
         btn0.setOnClickListener(this);
         btn1.setOnClickListener(this);
@@ -223,32 +191,90 @@ public class MainActivity extends Activity implements View.OnClickListener{
         btnLogo.setOnClickListener(this);
         btn8.setOnClickListener(this);
 
-        //lien internet OSM
-        tvLink.setMovementMethod(LinkMovementMethod.getInstance());
+        String[] permissions = {android.Manifest.permission.CAMERA, android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_PHONE_STATE,Manifest.permission.INTERNET};
+        Permissions.check(this/*context*/, permissions, null/*rationale*/, null/*options*/, new PermissionHandler() {
+            @Override
+            public void onGranted() {
+                // do your task.
 
-        // Démarrage service en tache de fond, démarré et lié (accés aux méthodes du service)
-        startAndBindService();
 
-        // Avertissement sur la consommation de batterie - affiché 5 fois
-        int numberWarnings = preferences.getInt("NOMBRE_DIALOG", 0);
-        prepareWarningDialog();
-        if (numberWarnings<5) {
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putInt("NOMBRE_DIALOG", numberWarnings+1);
-            editor.apply();
-            warningDialog();
-        }
+                // OSMdroid MapView
 
-        // Afficher le logo si présent
-        String path = preferences.getString("LOGOPATH", "") ;
-        if (path.length()>5) {
-            int factor = (getResources().getDimensionPixelSize(R.dimen.picture));
-            btnLogo.setImageBitmap(decodeSampledBitmap(path, factor, factor));
-            btnLogo.setVisibility(View.VISIBLE);
-            Log.i(TAG, "setting btnLogo");
-        }
+                // enregistrement de l'application auprès de OSMDROID
+                OpenStreetMapTileProviderConstants.setUserAgentValue(BuildConfig.APPLICATION_ID);
 
-        // display badge on some device that support it!
+
+                // nécessite la désactivation de l'accélération graphique matérielle à partir de Honeycomb
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+                    mapView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+                }
+
+                mOsmvController = mapView.getController();
+
+                // fonds de plan MAPNIK
+                mapView.setTileSource(TileSourceFactory.MAPNIK);
+
+                // permet le zoom à deux doigts
+                mapView.setBuiltInZoomControls(false);
+                mapView.setMultiTouchControls(true);
+
+                // centrer sur la France
+                mOsmvController.setZoom(6);
+                GeoPoint startingPoint = new GeoPoint(46177548, 2639465);
+                mOsmvController.setCenter(startingPoint);
+
+                // échelle graphique
+                ScaleBarOverlay myScaleBarOverlay = new ScaleBarOverlay(mapView);
+                mapView.getOverlays().add(myScaleBarOverlay);
+
+                // listener
+                mapView.setMapListener(new MapAdapter() {
+                    @Override
+                    public boolean onScroll(ScrollEvent event) {
+                        stopFollowing = true ;
+                        timeStop = System.currentTimeMillis();
+                        return super.onScroll(event);
+                    }
+                });
+
+                myLocationOverlayExists = new AtomicBoolean(false); // ajouté à V0.3 pour gérer l'affichage de la position
+
+
+
+                //lien internet OSM
+                tvLink.setMovementMethod(LinkMovementMethod.getInstance());
+
+                // Démarrage service en tache de fond, démarré et lié (accés aux méthodes du service)
+                startAndBindService();
+
+
+// Avertissement sur la consommation de batterie - affiché 5 fois
+                int numberWarnings = preferences.getInt("NOMBRE_DIALOG", 0);
+                prepareWarningDialog();
+                if (numberWarnings<5) {
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putInt("NOMBRE_DIALOG", numberWarnings+1);
+                    editor.apply();
+                    warningDialog();
+                }
+
+                // Afficher le logo si présent
+                String path = preferences.getString("LOGOPATH", "") ;
+                if (path.length()>5) {
+                    int factor = (getResources().getDimensionPixelSize(R.dimen.picture));
+                    btnLogo.setImageBitmap(decodeSampledBitmap(path, factor, factor));
+                    btnLogo.setVisibility(View.VISIBLE);
+                    Log.i(TAG, "setting btnLogo");
+                }
+
+
+
+
+
+            }
+        });
+
+// display badge on some device that support it!
 
         int badgeCount = 0;
         String _path = Environment.getExternalStorageDirectory().toString()+"/Documents";
@@ -261,7 +287,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                     badgeCount++;
                 }
             }
-        };
+        }
 
         boolean success = ShortcutBadger.applyCount(MainActivity.this, badgeCount);
 
@@ -277,7 +303,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
                 View checkBoxView = View.inflate(this, R.layout.checkbox, null);
                 CheckBox checkBox = (CheckBox) checkBoxView.findViewById(R.id.checkbox);
-                int id=Resources.getSystem().getIdentifier("btn_check_holo_light", "drawable", "android");
+                int id = Resources.getSystem().getIdentifier("btn_check_holo_light", "drawable", "android");
                 checkBox.setButtonDrawable(id);
 
                 checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -286,7 +312,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
                         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
                         SharedPreferences.Editor editor = prefs.edit();
-                        editor.putBoolean("dialog_status",isChecked);
+                        editor.putBoolean("dialog_status", isChecked);
 
                     }
                 });
@@ -295,7 +321,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle("Informations")
-                        .setMessage(getString(R.string.reminder).replace("%n",String.valueOf(badgeCount)))
+                        .setMessage(getString(R.string.reminder).replace("%n", String.valueOf(badgeCount)))
                         .setView(checkBoxView)
                         .setPositiveButton("OK", new DialogInterface.OnClickListener() {
                             @Override
@@ -308,7 +334,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
 
             }
-
 
 
         }
@@ -327,6 +352,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
     @Override
     protected void onStart() {
         super.onStart();
+
+
 
         takingPhoto=false;
 
