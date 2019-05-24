@@ -28,6 +28,7 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.telephony.TelephonyManager;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
@@ -129,6 +130,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private static final int  PICK_LOGO_KITKAT1 = 99;
     private static final int  PICK_LOGO_KITKAT2 = 100;
 
+    public class GenericFileProvider extends FileProvider {}
+
 
 
     // broadcast appelé chaque fois que le service déclare la disponibilité de nouvelles données ; l'affichage est alors mis à jour
@@ -191,7 +194,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         btnLogo.setOnClickListener(this);
         btn8.setOnClickListener(this);
 
-        String[] permissions = {android.Manifest.permission.CAMERA, android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.READ_PHONE_STATE,Manifest.permission.INTERNET};
+        String[] permissions = {android.Manifest.permission.CAMERA, Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE, android.Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION,Manifest.permission.READ_PHONE_STATE,Manifest.permission.INTERNET};
         Permissions.check(this/*context*/, permissions, null/*rationale*/, null/*options*/, new PermissionHandler() {
             @Override
             public void onGranted() {
@@ -558,10 +561,12 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 if (photoFile != null) {
 
                     // création de l'URI correspondant
-                    Uri photoURI = Uri.fromFile(photoFile);
+                    //Uri photoURI = Uri.fromFile(photoFile);
 
+                    Uri photoURI = FileProvider.getUriForFile(context,context.getApplicationContext().getPackageName()+".provider",photoFile);
+                    takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                     takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
-                    takePictureIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    //takePictureIntent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
                     takingPhoto=true;
 
