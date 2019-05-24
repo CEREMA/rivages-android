@@ -19,6 +19,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.ExifInterface;
+import android.app.AlertDialog;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Binder;
@@ -136,6 +137,7 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
     public interface NOTIFICATION_ID {
         public static int FOREGROUND_SERVICE = 101;
     }
+
 
 
 
@@ -504,6 +506,8 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
         }
 
         public void postdata() {
+
+
             String path = Environment.getExternalStorageDirectory().toString()+"/Documents";
             Log.d("Files", "Path: " + path);
             File directory = new File(path);
@@ -634,7 +638,7 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
             SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss", Locale.FRENCH);
             String dateName = formatter.format(today);
 
-            // création des fichier
+            // création des fichiers
 
             long mTime = System.currentTimeMillis();
             int i=0, j=1;
@@ -656,6 +660,8 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
                     cache.getAbsolutePath(),
                             dateName);
             i++;
+
+
 
             try {
                 FileWriter writer = new FileWriter(new File(raw_file_names[0]), false);

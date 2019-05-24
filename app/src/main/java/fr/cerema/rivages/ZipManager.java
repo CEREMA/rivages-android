@@ -26,6 +26,8 @@ public class ZipManager{
         ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(dest));
         byte data[] = new byte[BUFFER];
 
+            Log.d("Files", String.valueOf(_files));
+
         for (int i = 0; i < _files.length; i++) {
             if (_files[i]!=null) {
                 Log.v("Compress", "Adding: " + _files[i]);

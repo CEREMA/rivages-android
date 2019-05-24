@@ -617,7 +617,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                     try {
                     afterSend();
                     } catch(Exception e) {
-
+                        Log.i(TAG, "ERROR");
                     };
                 }
             }
@@ -625,7 +625,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 exiting = true;
                 try {
                 afterSend();} catch(Exception e) {
-
+                    Log.i(TAG, "ERROR");
                 };
             }
         }
@@ -643,7 +643,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         try {
             unbindService(mConnection);
         } catch(Exception e) {
-
+            Log.i(TAG, "ERROR");
         };
         // rendre le bouton 2 insensible pour éviter de redéclencher la méthode par erreur (résultat incertain !)
         btn2.setOnClickListener(null);
@@ -802,7 +802,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                             try {
                                 afterSend();
                             } catch(Exception e) {
-
+                                Log.i(TAG, "ERROR");
                             }
 
                         }
@@ -898,7 +898,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
             try {
                 afterSend();
             } catch(Exception e) {
-
+                Log.i(TAG, "ERROR");
             }
             }
 
