@@ -617,7 +617,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                     try {
                     afterSend();
                     } catch(Exception e) {
-                        Log.i(TAG, "ERROR");
+                        Log.i(TAG,"exception", e);
                     };
                 }
             }
@@ -625,7 +625,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 exiting = true;
                 try {
                 afterSend();} catch(Exception e) {
-                    Log.i(TAG, "ERROR");
+                    Log.i(TAG,"exception", e);
                 };
             }
         }
@@ -636,14 +636,15 @@ public class MainActivity extends Activity implements View.OnClickListener{
         Log.i(TAG, "afterSend");
         mGpsService.send();  // méthode envoie du service
         // messages de sortie et de remerciement
-        //Toast.makeText(context, getString(R.string.thank_text1), Toast.LENGTH_LONG).show();
-        Toast.makeText(context, getString(R.string.thank_text2), Toast.LENGTH_LONG).show();
+
+        //Toast.makeText(context, getString(R.string.thank_text2), Toast.LENGTH_LONG).show();
+
         // déconnexion du service
         Log.v(TAG, "afterSend - unbindService");
         try {
             unbindService(mConnection);
         } catch(Exception e) {
-            Log.i(TAG, "ERROR");
+            Log.i(TAG,"exception", e);
         };
         // rendre le bouton 2 insensible pour éviter de redéclencher la méthode par erreur (résultat incertain !)
         btn2.setOnClickListener(null);
@@ -802,7 +803,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                             try {
                                 afterSend();
                             } catch(Exception e) {
-                                Log.i(TAG, "ERROR");
+                                Log.i(TAG,"exception", e);
                             }
 
                         }
@@ -898,7 +899,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
             try {
                 afterSend();
             } catch(Exception e) {
-                Log.i(TAG, "ERROR");
+                Log.i(TAG,"exception", e);
             }
             }
 

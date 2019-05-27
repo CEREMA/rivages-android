@@ -19,7 +19,6 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.media.ExifInterface;
-import android.app.AlertDialog;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Binder;
