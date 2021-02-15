@@ -52,7 +52,7 @@
     <string name="logo_ask">Don\'t ask me again</string>
 
     <string name="warning_title">Warning !</string>
-    <string name="warning_text">Rivages uses your GPS phone with maximal accuracy. It causes drain battery.</string>
+    <string name="warning_text">Rivages uses your GPS phone with maximal accuracy. It causes drain battery. To register correctly, please check that "number of registered points" is increasing.</string>
     <string name="warning_yes">OK</string>
 
     <string name="thank_text1">Sending by E-Mail.</string>

@@ -604,6 +604,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     private void send() {
         // envoi des données
+        Toast.makeText(context, getString(R.string.thank_text2), Toast.LENGTH_LONG).show();
         if (bound) {
 
             if (mGpsService.getNumberOfPoint()>1) {
@@ -637,7 +638,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
         mGpsService.send();  // méthode envoie du service
         // messages de sortie et de remerciement
 
-        //Toast.makeText(context, getString(R.string.thank_text2), Toast.LENGTH_LONG).show();
+
+
 
         // déconnexion du service
         Log.v(TAG, "afterSend - unbindService");

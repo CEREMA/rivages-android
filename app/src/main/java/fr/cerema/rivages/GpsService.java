@@ -480,11 +480,14 @@ public class GpsService extends Service  implements LocationListener,GpsStatus.N
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
+            /*
             progressDialog.setMessage(getText(R.string.envoi_title));
             progressDialog.setTitle(getText(R.string.app_name));
             progressDialog.setIndeterminate(true);
-            progressDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_SYSTEM_ALERT);
+            progressDialog.getWindow().setType(WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY);
             progressDialog.show();
+            */
+
         }
 
         public String getMd5Hash(String input) {
